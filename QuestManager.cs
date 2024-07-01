@@ -12,6 +12,14 @@ public enum QuestObject
 {
     zhiliaoyaoshui,
     qiangxiaozhiliaoyaoshui,
+    shuimianyaoji,
+    qiangxiaoshuimianyaoji,
+    fanghuoyaoji,
+    qiangxiaofanghuoyaoji,
+    xingyunyaoji,
+    qiangxiaoxingyunyaoji,
+    yinxingyaoji,
+    qiangxiaoyinxingyaoji
 }
 
 public class QuestManager : MonoBehaviour
@@ -22,12 +30,12 @@ public class QuestManager : MonoBehaviour
     public List<Sprite> questSprites = new List<Sprite>();
     public List<Sprite> dialogueSprites = new List<Sprite>();
     public RectTransform timerBar;
+    public bool isTimerActive = false;
     public float maxTime = 15f;
     private readonly Color blueishGreen = new Color(26f / 255f, 255f / 255f, 179f / 255f);
     private readonly Color darkPurple = new Color(181f / 255f, 35f / 255f, 69f / 255f);
     private float timeRemaining;
     private float initialWidth = 1440f;
-    private bool isTimerActive = false;
 
     private QuestObject questObject;
 
@@ -40,6 +48,7 @@ public class QuestManager : MonoBehaviour
 
     public void AddQuest()
     {
+        GameManager.instance.moneyCountButtonText.text = "$ " + GameManager.instance.moneyCount.ToString();
         this.questObject = GetRandomQuestObject();
         foreach (Transform child in transform)
         {
@@ -110,6 +119,14 @@ public class QuestManager : MonoBehaviour
     {
         if (GameManager.instance.GetSelectedCard().Count != 0 && GameManager.instance.GetSelectedCard()[0].GetComponent<CardControl>().cardObject.ToString() == questObject.ToString())
         {
+            if(GameManager.instance.GetSelectedCard()[0].GetComponent<CardControl>().cardObject == CardObject.zhiliaoyaoshui)
+            {
+                GameManager.instance.moneyCount += GameManager.instance.smallPotionPrice;
+            }
+            else if(GameManager.instance.GetSelectedCard()[0].GetComponent<CardControl>().cardObject == CardObject.qiangxiaozhiliaoyaoshui)
+            {
+                GameManager.instance.moneyCount += GameManager.instance.bigPotionPrice;
+            }
             foreach (CardControl card in GameManager.instance.GetSelectedCard())
             {
                 Destroy(card.gameObject);
@@ -123,6 +140,21 @@ public class QuestManager : MonoBehaviour
     {
         Array values = Enum.GetValues(typeof(QuestObject));
         QuestObject randomQuest = (QuestObject)values.GetValue(Random.Range(0, values.Length));
-        return randomQuest;
+        if ((GameManager.instance.fanghuoyaojiPermit && 
+            (randomQuest == QuestObject.fanghuoyaoji || randomQuest == QuestObject.qiangxiaofanghuoyaoji)) ||
+            (GameManager.instance.shuimianyaojiPermit && 
+            (randomQuest == QuestObject.shuimianyaoji || randomQuest == QuestObject.qiangxiaoshuimianyaoji)) ||
+            (GameManager.instance.yinxingyaojiPermit && 
+            (randomQuest == QuestObject.yinxingyaoji || randomQuest == QuestObject.qiangxiaoyinxingyaoji)) ||
+            (GameManager.instance.xingyunyaojiPermit && 
+            (randomQuest == QuestObject.xingyunyaoji || randomQuest == QuestObject.qiangxiaoxingyunyaoji)) ||
+            (randomQuest == QuestObject.zhiliaoyaoshui || randomQuest == QuestObject.qiangxiaozhiliaoyaoshui))
+        {
+            return randomQuest;
+        }
+        else
+        {
+            return GetRandomQuestObject();
+        }
     }
 }

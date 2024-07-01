@@ -4,6 +4,8 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
+
 [System.Serializable]
 public enum CardObject
 {
@@ -14,6 +16,23 @@ public enum CardObject
     shuijing,
     zhiliaoyaoshui,
     qiangxiaozhiliaoyaoshui,
+    mandelacao,
+    yizhijian,
+    shuiyin,
+    yinxingyaoji,
+    qiangxiaoyinxingyaoji,
+    honglajiao,
+    longxueshuzhi,
+    liuhuang,
+    fanghuoyaoji,
+    qiangxiaofanghuoyaoji,
+    yingli,
+    siyecao,
+    jinfen,
+    shuimianyaoji,
+    qiangxiaoshuimianyaoji,
+    xingyunyaoji,
+    qiangxiaoxingyunyaoji,
 }
 
 public enum TraitObjects
@@ -23,6 +42,13 @@ public enum TraitObjects
     gaobiaozhun,
     guanggao,
     maiyisongyi,
+    shuimianyaojipermit,
+    fanghuoyaojipermit,
+    yinxingyaojipermit,
+    xingyunyaojipermit,
+    xiaofei,
+    shunengshengqiao,
+    piliangjinhuo,
 }
 
 public struct CardInfo
@@ -42,13 +68,27 @@ public class GameManager : MonoBehaviour
     public Sprite[] cardSprite;
     public Sprite[] traitSprites;
     public float theMaterialCount = 5;
-    public float dayCount = 0;
+    public float dayCount = 1;
     public float questCount = 0;
     public float questNeeded = 3;
+    public float moneyCount = 100;
+    public float refreshCount = 15;
+    public float refreshIncrement = 5;
+    public float smallPotionPrice = 25;
+    public float bigPotionPrice = 35;
+    public bool nextRowFree = false;
     public GameObject traitPrefab;
     public Transform traitSelectionPanel;
     public Transform questDeck;
     public Transform potDeck;
+    public TextMeshProUGUI purhcaseCardButtonText;
+    public TextMeshProUGUI dayCountButtonText;
+    public TextMeshProUGUI moneyCountButtonText;
+    public bool maiyisongyiPermit = false;
+    public bool shuimianyaojiPermit = false;
+    public bool fanghuoyaojiPermit = false;
+    public bool yinxingyaojiPermit = false;
+    public bool xingyunyaojiPermit = false;
 
     private List<CardControl> selectedCard = new List<CardControl>();
     private List<CardInfo> cardInfos = new List<CardInfo>();
@@ -68,7 +108,19 @@ public class GameManager : MonoBehaviour
     {
         foreach (CardObject card in Enum.GetValues(typeof(CardObject)))
         {
-            if (card != CardObject.CardBase && card != CardObject.ThePotWater && card != CardObject.zhiliaoyaoshui && card != CardObject.qiangxiaozhiliaoyaoshui)
+            if (card == CardObject.jinzhanhua || card == CardObject.shuweicao || card == CardObject.shuijing)
+            {
+                cardInfos.Add(new CardInfo(card));
+            }else if (yinxingyaojiPermit == true && (card == CardObject.mandelacao || card == CardObject.yizhijian || card == CardObject.shuiyin))
+            {
+                cardInfos.Add(new CardInfo(card));
+            }else if (shuimianyaojiPermit == true && (card == CardObject.mandelacao || card == CardObject.yingli || card == CardObject.shuweicao))
+            {
+                cardInfos.Add(new CardInfo(card));
+            }else if (fanghuoyaojiPermit == true && (card == CardObject.longxueshuzhi || card == CardObject.honglajiao || card == CardObject.liuhuang))
+            {
+                cardInfos.Add(new CardInfo(card));
+            }else if (xingyunyaojiPermit == true && (card == CardObject.siyecao || card == CardObject.jinzhanhua || card == CardObject.jinfen))
             {
                 cardInfos.Add(new CardInfo(card));
             }
@@ -77,6 +129,10 @@ public class GameManager : MonoBehaviour
 
     private void spawnCard()
     {
+        refreshCount = 15;
+        dayCountButtonText.text = "Day " + dayCount.ToString();
+        moneyCountButtonText.text = "$ " + moneyCount.ToString();
+        purhcaseCardButtonText.text = "$ " + refreshCount.ToString();
         foreach (Transform column in cardDeck)
         {
             for (int i = column.childCount - 1; i > 0; i--)
@@ -126,20 +182,36 @@ public class GameManager : MonoBehaviour
             }
         }
         RemoveSelectedCard();
-        foreach (Transform colume in cardDeck)
+        if (moneyCount >= refreshCount || nextRowFree)
         {
-            float posY = colume.childCount * 15;
-            for (int i = 0; i < 3; i++)
+            if (nextRowFree){
+                nextRowFree = false;
+            }else {
+                moneyCount -= refreshCount;
+                refreshCount += refreshIncrement;
+            }
+            moneyCountButtonText.text = "$ " + moneyCount.ToString();
+            purhcaseCardButtonText.text = "$ " + refreshCount.ToString();
+            foreach (Transform colume in cardDeck)
             {
-                int index = Random.Range(0, cardInfos.Count);
-                CardInfo cardInfo = cardInfos[index];
+                float posY = colume.childCount * 15;
+                for (int i = 0; i < 3; i++)
+                {
+                    int index = Random.Range(0, cardInfos.Count);
+                    CardInfo cardInfo = cardInfos[index];
 
-                Sprite sp = cardSprite[(int)cardInfo.cardObject];
-                GameObject gameCard = Instantiate(card, colume);
-                gameCard.GetComponent<CardControl>().Init(cardInfo.cardObject);
-                gameCard.transform.DOLocalMove(new Vector3(0, posY, 0), 0.1f);
-                gameCard.GetComponent<Image>().sprite = sp;
-                posY += 15;
+                    Sprite sp = cardSprite[(int)cardInfo.cardObject];
+                    GameObject gameCard = Instantiate(card, colume);
+                    gameCard.GetComponent<CardControl>().Init(cardInfo.cardObject);
+                    gameCard.transform.DOLocalMove(new Vector3(0, posY, 0), 0.1f);
+                    gameCard.GetComponent<Image>().sprite = sp;
+                    posY += 15;
+                }
+            }
+            if (maiyisongyiPermit && HasTwentyFivePercentChance())
+            {
+                nextRowFree = true;
+                purhcaseCardButtonText.text = "$ 0";
             }
         }
     }
@@ -184,9 +256,6 @@ public class GameManager : MonoBehaviour
 
     public void traitSelection()
     {
-        cardDeck = transform.Find("CardDeck").transform;
-        initCardInfoList();
-        spawnCard();
         AddTrait();
         traitSelectionPanel.DOLocalMove(new Vector3(0, 0, 0), 0.3f);
     }
@@ -205,6 +274,9 @@ public class GameManager : MonoBehaviour
 
     public void OnTraitSelection()
     {
+        cardDeck = transform.Find("CardDeck").transform;
+        initCardInfoList();
+        spawnCard();
         Sequence sequence5 = DOTween.Sequence();
         traitSelectionPanel.DOLocalMove(new Vector3(-1440, 0, 0), 0.3f);
         sequence5.AppendInterval(5f).OnComplete(() => QuestManager.instance.AddQuest());
@@ -233,6 +305,12 @@ public class GameManager : MonoBehaviour
 
         usedTraits.Add(randomTrait);
         return randomTrait;
+    }
+
+    public static bool HasTwentyFivePercentChance()
+    {
+        int number = Random.Range(0, 100);
+        return number < 25;
     }
 }
 

@@ -47,6 +47,38 @@ public class PotManager : MonoBehaviour
             destroyedCardCounts[CardObject.zhiliaoyaoshui] >= 1 && destroyedCardCounts[CardObject.shuijing] >= GameManager.instance.theMaterialCount)
         {
             AddCardToParent(CardObject.qiangxiaozhiliaoyaoshui);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.honglajiao) && destroyedCardCounts.ContainsKey(CardObject.longxueshuzhi) &&
+            destroyedCardCounts[CardObject.honglajiao] >= 1 && destroyedCardCounts[CardObject.longxueshuzhi] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.fanghuoyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.fanghuoyaoji) && destroyedCardCounts.ContainsKey(CardObject.liuhuang) &&
+            destroyedCardCounts[CardObject.fanghuoyaoji] >= 1 && destroyedCardCounts[CardObject.liuhuang] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.qiangxiaofanghuoyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.mandelacao) && destroyedCardCounts.ContainsKey(CardObject.yingli) &&
+            destroyedCardCounts[CardObject.mandelacao] >= 1 && destroyedCardCounts[CardObject.yingli] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.shuimianyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.shuimianyaoji) && destroyedCardCounts.ContainsKey(CardObject.shuweicao) &&
+            destroyedCardCounts[CardObject.shuimianyaoji] >= 1 && destroyedCardCounts[CardObject.shuweicao] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.qiangxiaoshuimianyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.mandelacao) && destroyedCardCounts.ContainsKey(CardObject.yizhijian) &&
+            destroyedCardCounts[CardObject.mandelacao] >= 1 && destroyedCardCounts[CardObject.yizhijian] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.yinxingyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.yinxingyaoji) && destroyedCardCounts.ContainsKey(CardObject.shuiyin) &&
+            destroyedCardCounts[CardObject.yinxingyaoji] >= 1 && destroyedCardCounts[CardObject.shuiyin] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.qiangxiaoyinxingyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.siyecao) && destroyedCardCounts.ContainsKey(CardObject.jinzhanhua) &&
+            destroyedCardCounts[CardObject.siyecao] >= 1 && destroyedCardCounts[CardObject.jinzhanhua] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.xingyunyaoji);
+        }else if (destroyedCardCounts.ContainsKey(CardObject.xingyunyaoji) && destroyedCardCounts.ContainsKey(CardObject.jinfen) &&
+            destroyedCardCounts[CardObject.xingyunyaoji] >= 1 && destroyedCardCounts[CardObject.jinfen] >= GameManager.instance.theMaterialCount)
+        {
+            AddCardToParent(CardObject.qiangxiaoxingyunyaoji);
         }
     }
 
